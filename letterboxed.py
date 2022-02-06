@@ -27,7 +27,7 @@ class LetterBoxed:
         self.puzzle_letters = {letter for side in self.sides for letter in side}
         self.len_threshold = len_threshold
 
-        # build trie from .txt word list
+        # build trie from newline-delimited .txt word list
         self.root = WordTrieNode('', None)
         with open(dictionary) as f:
             for line in f.readlines():
