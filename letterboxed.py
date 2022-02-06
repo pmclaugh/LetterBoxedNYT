@@ -95,10 +95,11 @@ class LetterBoxed:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--puzzle', default='mrf-sna-opu-gci', type=str)
-    parser.add_argument('--dict', default='words.txt', type=str)
+    parser.add_argument('--puzzle', default='mrf-sna-opu-gci', type=str, help='puzzle input in abd-def-ghi-jkl format')
+    parser.add_argument('--dict', default='words.txt', type=str, help='path to newline-delimited text file of valid words')
+    parser.add_argument('--len', default=3, type=int, help='maximum length, in words, of solutions')
     args = parser.parse_args()
     print("solving puzzle", args.puzzle)
-    puzzle = LetterBoxed(args.puzzle, args.dict, len_threshold=2)
+    puzzle = LetterBoxed(args.puzzle, args.dict, len_threshold=args.len)
     print(len(puzzle.find_all_solutions()))
 
