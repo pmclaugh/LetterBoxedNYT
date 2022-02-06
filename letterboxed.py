@@ -20,7 +20,7 @@ class WordTrieNode:
 
 class LetterBoxed:
     @timed
-    def __init__(self, input_string: str, len_threshold=3):
+    def __init__(self, input_string: str, dictionary: str, len_threshold=3):
         # parse the input string (abc-def-ghi-jkl) into set of 4 sides
         self.input_string = input_string.lower()
         self.sides = {side for side in input_string.split('-')}
@@ -29,7 +29,7 @@ class LetterBoxed:
 
         # build trie from .txt word list
         self.root = WordTrieNode('', None)
-        with open('words.txt') as f:
+        with open(dictionary) as f:
             for line in f.readlines():
                 self.add_word(line.strip().lower())
 
@@ -96,7 +96,9 @@ class LetterBoxed:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--puzzle', default='mrf-sna-opu-gci', type=str)
+    parser.add_argument('--dict', default='words.txt', type=str)
     args = parser.parse_args()
-    puzzle = LetterBoxed(args.puzzle)
+    print("solving puzzle", args.puzzle)
+    puzzle = LetterBoxed(args.puzzle, args.dict, len_threshold=2)
     print(len(puzzle.find_all_solutions()))
 
