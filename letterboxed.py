@@ -22,18 +22,22 @@ class WordTrieNode:
 class LetterBoxed:
     @timed
     def __init__(self, input_string: str, len_threshold=3):
+        # parse the input string (abc-def-ghi-jkl) into set of 4 sides
         self.input_string = input_string.lower()
         self.sides = {side for side in input_string.split('-')}
         self.puzzle_letters = {letter for side in self.sides for letter in side}
         self.len_threshold = len_threshold
 
+        # build trie from .txt word list
         self.root = WordTrieNode('', None)
         with open('words.txt') as f:
             for line in f.readlines():
                 self.add_word(line.strip().lower())
 
+        # find all valid words in puzzle
         self.puzzle_words = self.get_puzzle_words()
 
+        # map valid words by starting letter
         self.starting_letter_map = defaultdict(list)
         for word in self.puzzle_words:
             self.starting_letter_map[word[0]].append(word)
@@ -63,6 +67,7 @@ class LetterBoxed:
             for starting_letter in starting_side:
                 if starting_letter in self.root.children:
                     all_valid_nodes += self._puzzle_words_inner(self.root.children[starting_letter], starting_side)
+        # only bother to build strings for usable nodes
         return [node.get_word() for node in all_valid_nodes]
 
     def _find_solutions_inner(self, partial_solution: List[str], used_letters: Set[str]) -> List[List[str]]:

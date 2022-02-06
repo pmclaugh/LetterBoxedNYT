@@ -1,3 +1,6 @@
+from functools import wraps
+from datetime import datetime
+
 def timed(func):
     @wraps(func)
     def timed_func(*args, **kwargs):
