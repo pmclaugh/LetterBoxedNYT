@@ -36,10 +36,9 @@ class LetterBoxed:
         # find all valid words in puzzle
         self.puzzle_words = self.get_puzzle_words()
 
-        # map valid words by starting letter
-        self.starting_letter_map = defaultdict(list)
+        self.puzzle_graph = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         for word in self.puzzle_words:
-            self.starting_letter_map[word[0]].append(word)
+            self.puzzle_graph[word[0]][word[-1]][frozenset(word)].append(word)
 
     def add_word(self, word) -> None:
         node = self.root
@@ -69,27 +68,27 @@ class LetterBoxed:
         # only bother to build strings for usable nodes
         return [node.get_word() for node in all_valid_nodes]
 
-    def _find_solutions_inner(self, partial_solution: List[str], used_letters: Set[str]) -> List[List[str]]:
+    def _find_solutions_inner(self, path: List[frozenset], letters: Set[str], next_letter: str) -> List[List[frozenset]]:
         # termination criteria
-        if len(used_letters) == 12:
-            return [partial_solution]
-        elif len(partial_solution) == self.len_threshold:
+        if len(letters) == 12:
+            return [path]
+        elif len(path) == self.len_threshold:
             return []
 
-        # last letter of the last word
-        next_letter = partial_solution[-1][-1]
         solutions = []
-        for next_word in self.starting_letter_map[next_letter]:
-            added_letters = set(next_word) - used_letters
-            if added_letters:
-                solutions += self._find_solutions_inner(partial_solution + [next_word], used_letters | added_letters)
+        for last_letter in self.puzzle_graph[next_letter]:
+            for letter_edge in self.puzzle_graph[next_letter][last_letter]:
+                if letter_edge - letters:
+                    solutions += self._find_solutions_inner(path + [letter_edge], letters | letter_edge, last_letter)
         return solutions
 
     @timed
     def find_all_solutions(self) -> List[List[str]]:
         all_solutions = []
-        for word in self.puzzle_words:
-            all_solutions += self._find_solutions_inner([word], set(word))
+        for first_letter in self.puzzle_letters:
+            for last_letter in self.puzzle_letters:
+                for letter_edge in self.puzzle_graph[first_letter][last_letter]:
+                    all_solutions += self._find_solutions_inner([letter_edge], letter_edge, last_letter)
         return all_solutions
 
 
@@ -101,5 +100,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print("solving puzzle", args.puzzle)
     puzzle = LetterBoxed(args.puzzle, args.dict, len_threshold=args.len)
-    print(len(puzzle.find_all_solutions()))
+    solns = puzzle.find_all_solutions()
+    # print(solns)
+    print(len(solns))
 
