@@ -2,7 +2,6 @@ import argparse
 from typing import List, Set, Union
 from collections import defaultdict
 from utils import timed
-from bisect import bisect_left
 
 
 class WordTrieNode:
