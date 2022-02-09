@@ -3,7 +3,6 @@ from typing import List, Set, Union
 from collections import defaultdict
 from utils import timed
 
-
 class WordTrieNode:
     def __init__(self, value: str, parent: Union['WordTrieNode', None]):
         self.value = value
@@ -67,11 +66,9 @@ class LetterBoxed:
             for starting_letter in starting_side:
                 if starting_letter in self.root.children:
                     all_valid_nodes += self._puzzle_words_inner(self.root.children[starting_letter], starting_side)
-        # only bother to build strings for usable nodes
         return [node.get_word() for node in all_valid_nodes]
 
     def _find_solutions_inner(self, path_words: List[List[str]], letters: Set[str], next_letter: str) -> List[List[List[str]]]:
-        # termination criteria
         if len(letters) == 12:
             return [path_words]
         elif len(path_words) == self.len_threshold:
@@ -100,16 +97,18 @@ if __name__ == '__main__':
     parser.add_argument('--dict', default='words.txt', type=str, help='path to newline-delimited text file of valid words')
     parser.add_argument('--len', default=3, type=int, help='maximum length, in words, of solutions')
     args = parser.parse_args()
+
     print("solving puzzle", args.puzzle)
     puzzle = LetterBoxed(args.puzzle, args.dict, len_threshold=args.len)
-    solns = puzzle.find_all_solutions()
+    print(len(puzzle.puzzle_words), "valid words found")
+    meta_solutions = puzzle.find_all_solutions()
+    print(len(meta_solutions), "meta-solutions (meaningfully distinct paths)")
     full_count = 0
-    for meta_solution in solns:
+    for meta_solution in meta_solutions:
         count = 1
         for element in meta_solution:
             count *= len(element)
         full_count += count
-    print(len(solns))
-    print(full_count)
+    print(full_count, "total solutions (unique combinations/orders of words)")
 
 
